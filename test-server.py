@@ -1,6 +1,7 @@
 import socket
 
 def start(ip, port):
+    print(ip, port)
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((ip, port))
     server_socket.listen(10)
@@ -17,4 +18,4 @@ def start(ip, port):
 
 
 if __name__ == '__main__':
-    start(socket.gethostbyname(socket.gethostname()), 88)
+    start('127.0.0.1', 8888)
