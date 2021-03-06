@@ -1,0 +1,10 @@
+QPushButton {
+    background-color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+}
+
+QSvgWidget {
+     height: 20px;
+     width: 20px;
+}
