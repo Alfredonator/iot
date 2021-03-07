@@ -29,10 +29,10 @@ class Display(qtw.QWidget):
 
 ### GENERAL UI ADDER
     def addUI(self):
-        self.add_button('start', 3, 1, Button_handlers.start)
-        self.add_button('stop', 4, 1, Button_handlers.stop)
-        self.add_button('unbreak', 3, 0, Button_handlers.unbreak)
-        self.add_button('calibrate', 4, 0, Button_handlers.calibrate)
+        self.add_button('START', 3, 1, Button_handlers.start)
+        self.add_button('STOP', 4, 1, Button_handlers.stop)
+        self.add_button('UNBREAK', 3, 0, Button_handlers.unbreak)
+        self.add_button('CALIBRATE', 4, 0, Button_handlers.calibrate)
         self.add_svg('imgs/process.svg')
 
     ### PARTICULAR WIDGET ADDERS
@@ -46,7 +46,7 @@ class Display(qtw.QWidget):
 
     def add_button(self, name, column_place, row_place, func):
         btn = qtw.QPushButton(name)
-        btn.setFixedSize(200, 100)
+        btn.setFixedSize(230, 130)
         btn.clicked.connect(func)
 
         shadow = qtw.QGraphicsDropShadowEffect()
