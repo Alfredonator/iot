@@ -25,7 +25,7 @@ class Display(qtw.QWidget):
 
         self.client = client
 
-        self.show()
+        self.showFullScreen()
 
 ### GENERAL UI ADDER
     def addUI(self):
