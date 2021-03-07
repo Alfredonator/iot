@@ -8,15 +8,18 @@ from utils import Utils
 
 IP = '127.0.0.1' #CHANGEABLE
 PORT = 8888
-WIDTH = 320
-HEIGHT = 480
+WIDTH = 480
+HEIGHT = 800
 
 class Display(qtw.QWidget):
     def __init__(self, client):
         super().__init__()
         self.setWindowTitle('Controller')
         self.button_layout = qtw.QGridLayout()
-        self.setFixedSize(HEIGHT, WIDTH)
+        self.button_layout.setColumnStretch(0, 4)
+        self.button_layout.setColumnStretch(1, 4)
+
+        self.setFixedSize(WIDTH, HEIGHT)
         self.addUI()
         self.setLayout(self.button_layout)
 
@@ -26,11 +29,11 @@ class Display(qtw.QWidget):
 
 ### GENERAL UI ADDER
     def addUI(self):
+        self.add_button('start', 3, 1, Button_handlers.start)
+        self.add_button('stop', 4, 1, Button_handlers.stop)
+        self.add_button('unbreak', 3, 0, Button_handlers.unbreak)
+        self.add_button('calibrate', 4, 0, Button_handlers.calibrate)
         self.add_svg('imgs/process.svg')
-        self.add_button('calibrate', 1, 0, Button_handlers.calibrate)
-        self.add_button('unbreak', 1, 1, Button_handlers.unbreak)
-        self.add_button('stop', 2, 0, Button_handlers.stop)
-        self.add_button('start', 2, 1, Button_handlers.start)
 
     ### PARTICULAR WIDGET ADDERS
     def add_label(self, text, column_place, row_place):
@@ -39,12 +42,19 @@ class Display(qtw.QWidget):
     def add_svg(self, path):
         svg_widget = QtSvg.QSvgWidget(path)
         svg_widget.setFixedSize(100, 100)
-        self.button_layout.addWidget(svg_widget, 0, 0, 1, 2, alignment=QtCore.Qt.AlignCenter)
+        self.button_layout.addWidget(svg_widget, 0, 0, 2, 2, alignment=QtCore.Qt.AlignCenter)
 
     def add_button(self, name, column_place, row_place, func):
         btn = qtw.QPushButton(name)
-        btn.setFixedSize(100, 50)
+        btn.setFixedSize(200, 100)
         btn.clicked.connect(func)
+
+        shadow = qtw.QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(20)
+        shadow.setColor(QtCore.Qt.lightGray)
+
+        btn.setGraphicsEffect(shadow)
+
         self.button_layout.addWidget(btn, column_place, row_place)
 
 ### HELPERS

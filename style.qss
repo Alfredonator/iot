@@ -2,6 +2,11 @@ QPushButton {
     background-color: white;
     border-radius: 15px;
     border: 1px solid white;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 15px;
 }
 
 QSvgWidget {
