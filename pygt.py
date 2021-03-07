@@ -8,8 +8,8 @@ from utils import Utils
 
 IP = '127.0.0.1' #CHANGEABLE
 PORT = 8888
-WIDTH = 480
-HEIGHT = 320
+WIDTH = 320
+HEIGHT = 480
 
 class Display(qtw.QWidget):
     def __init__(self, client):
