@@ -18,7 +18,7 @@ class Button_handler:
     def unbreak(self):
         print('unbreak')
         try:
-            subprocess.call('../scripts/unbreak.bash')
+            subprocess.call('./scripts/unbreak.bash')
         except Exception as e:
             print(e)
             raise
@@ -101,7 +101,7 @@ def start():
     #     client.connect((IP, int(PORT)))
     # except Exception as e:
     #     print(e)
-    subprocess.call('../scripts/start.bash')
+    subprocess.call('./scripts/start.bash')
 
     app = qtw.QApplication([])
     mw = Display()
