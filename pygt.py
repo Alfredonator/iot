@@ -2,14 +2,38 @@ import PyQt5.QtWidgets as qtw
 from PyQt5 import QtSvg, QtCore
 import socket
 
+from PyQt5.QtCore import pyqtSlot
 
-from handlers import Button_handlers
+from handlers import Button_handler
 from utils import Utils
 
-IP = '127.0.0.1' #CHANGEABLE
-PORT = 8888
+IP = '20.76.51.149' #CHANGEABLE
+PORT = 15002
 WIDTH = 480
 HEIGHT = 800
+
+class Button_handler:
+
+    @pyqtSlot()
+    def unbreak(self):
+        print('unbreak')
+        try:
+            client.send("unbreak".encode())
+        except Exception as e:
+            print(e)
+            raise
+
+    @pyqtSlot()
+    def calibrate(self):
+        print('calibrate')
+
+    @pyqtSlot()
+    def start(self):
+        print('start')
+
+    @pyqtSlot()
+    def stop(self):
+        print('stop')
 
 class Display(qtw.QWidget):
     def __init__(self, client):
@@ -19,20 +43,21 @@ class Display(qtw.QWidget):
         self.button_layout.setColumnStretch(0, 4)
         self.button_layout.setColumnStretch(1, 4)
 
+        self.client = client
         self.setFixedSize(WIDTH, HEIGHT)
-        self.addUI()
+        self.addUI(client)
         self.setLayout(self.button_layout)
 
-        self.client = client
 
         self.showFullScreen()
 
 ### GENERAL UI ADDER
-    def addUI(self):
-        self.add_button('START', 3, 1, Button_handlers.start)
-        self.add_button('STOP', 4, 1, Button_handlers.stop)
-        self.add_button('UNBREAK', 3, 0, Button_handlers.unbreak)
-        self.add_button('CALIBRATE', 4, 0, Button_handlers.calibrate)
+    def addUI(self, client):
+        # button_handler = Button_handler(client)
+        self.add_button('START', 3, 1, Button_handler.start)
+        self.add_button('STOP', 4, 1, Button_handler.stop)
+        self.add_button('UNBREAK', 3, 0, Button_handler.unbreak)
+        self.add_button('CALIBRATE', 4, 0, Button_handler.calibrate)
         self.add_svg('imgs/process.svg')
 
     ### PARTICULAR WIDGET ADDERS
@@ -49,6 +74,7 @@ class Display(qtw.QWidget):
         btn.setFixedSize(230, 130)
         btn.clicked.connect(func)
 
+        #just a shadow design
         shadow = qtw.QGraphicsDropShadowEffect()
         shadow.setBlurRadius(20)
         shadow.setColor(QtCore.Qt.lightGray)
@@ -71,6 +97,7 @@ class Display(qtw.QWidget):
     #         self.layout().addWidget(obj, column_place, row_place)
 
 def start():
+    global client
     try:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect((IP, int(PORT)))

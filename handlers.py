@@ -1,6 +1,7 @@
 from PyQt5.QtCore import pyqtSlot
 
-class Button_handlers:
+class Button_handler:
+
     @pyqtSlot()
     def unbreak(self):
         print('unbreak')
@@ -21,3 +22,4 @@ class Button_handlers:
     @pyqtSlot()
     def stop(self):
         print('stop')
+
