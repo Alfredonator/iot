@@ -1,14 +1,14 @@
 import PyQt5.QtWidgets as qtw
 from PyQt5 import QtSvg, QtCore
 import socket
+import subprocess
 
 from PyQt5.QtCore import pyqtSlot
-
 from handlers import Button_handler
 from utils import Utils
 
-IP = '20.76.51.149' #CHANGEABLE
-PORT = 15002
+IP = '10.42.0.49' #CHANGEABLE
+PORT = 11311
 WIDTH = 480
 HEIGHT = 800
 
@@ -18,7 +18,7 @@ class Button_handler:
     def unbreak(self):
         print('unbreak')
         try:
-            client.send("unbreak".encode())
+            subprocess.call('../scripts/unbreak.bash')
         except Exception as e:
             print(e)
             raise
@@ -36,24 +36,22 @@ class Button_handler:
         print('stop')
 
 class Display(qtw.QWidget):
-    def __init__(self, client):
+    def __init__(self, ):
         super().__init__()
         self.setWindowTitle('Controller')
         self.button_layout = qtw.QGridLayout()
         self.button_layout.setColumnStretch(0, 4)
         self.button_layout.setColumnStretch(1, 4)
 
-        self.client = client
         self.setFixedSize(WIDTH, HEIGHT)
-        self.addUI(client)
+        self.addUI()
         self.setLayout(self.button_layout)
 
 
         self.showFullScreen()
 
 ### GENERAL UI ADDER
-    def addUI(self, client):
-        # button_handler = Button_handler(client)
+    def addUI(self):
         self.add_button('START', 3, 1, Button_handler.start)
         self.add_button('STOP', 4, 1, Button_handler.stop)
         self.add_button('UNBREAK', 3, 0, Button_handler.unbreak)
@@ -97,15 +95,16 @@ class Display(qtw.QWidget):
     #         self.layout().addWidget(obj, column_place, row_place)
 
 def start():
-    global client
-    try:
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect((IP, int(PORT)))
-    except Exception as e:
-        print(e)
+    # global client
+    # try:
+    #     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     client.connect((IP, int(PORT)))
+    # except Exception as e:
+    #     print(e)
+    subprocess.call('../scripts/start.bash')
 
     app = qtw.QApplication([])
-    mw = Display(client)
+    mw = Display()
     mw.setFixedSize(HEIGHT, WIDTH)
 
     with open('style.qss', 'r') as f:

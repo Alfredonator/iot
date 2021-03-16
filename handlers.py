@@ -1,4 +1,6 @@
 from PyQt5.QtCore import pyqtSlot
+import subprocess
+
 
 class Button_handler:
 
@@ -6,7 +8,7 @@ class Button_handler:
     def unbreak(self):
         print('unbreak')
         try:
-            self.client.send("unbreak".encode())
+            subprocess.call('../scripts/unbreak.bash')
         except Exception as e:
             print(e)
             raise
