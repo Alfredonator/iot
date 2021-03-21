@@ -1,111 +1,165 @@
 import PyQt5.QtWidgets as qtw
 from PyQt5 import QtSvg, QtCore
-import socket
 import subprocess
+from dotenv import load_dotenv
+from PyQt5.QtGui import QFont
+import os
 
-from PyQt5.QtCore import pyqtSlot
-from handlers import Button_handler
-from utils import Utils
+load_dotenv()
 
-IP = '10.42.0.49' #CHANGEABLE
-PORT = 11311
-WIDTH = 480
-HEIGHT = 800
+ip = os.getenv('IP')
+port = int(os.getenv('PORT'))
+height = int(os.getenv('HEIGHT'))
+width = int(os.getenv('WIDTH'))
+is_raspberry = os.getenv('RASP')
 
-class Button_handler:
+class Calibration_view(qtw.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.joint_counter = 1
 
-    @pyqtSlot()
-    def unbreak(self):
+        layout = qtw.QGridLayout()
+
+        svg_icon = add_svg('imgs/robotics.svg')
+
+        self.label = qtw.QLabel("Joint number: {}".format(self.joint_counter))
+
+        self.btn_next = add_button('CALIBRATE NEXT JOINT', self.next_joint, 260)
+        self.btn_next.setStyleSheet('background-color: gold')
+        shade_calib_btn = add_shadow()
+        self.btn_next.setGraphicsEffect(shade_calib_btn)
+
+        layout.addWidget(svg_icon, 0, 0, 1, 1, alignment=QtCore.Qt.AlignRight)
+        layout.addWidget(self.label, 0, 1, 1, 2, alignment=QtCore.Qt.AlignLeft)
+        layout.addWidget(self.btn_next, 0, 2, alignment=QtCore.Qt.AlignCenter)
+
+        btn_right = add_button('>', self.arrow_right, 150, 100)
+        btn_left = add_button('<', self.arrow_left, 150, 100)
+        btn_up = add_button('^', self.arrow_up, 150, 100)
+        btn_down = add_button('.', self.arrow_down, 150, 100)
+        btn_break = add_button('UNBREAK', unbreak, 190, 100)
+        btn_break.setStyleSheet('background-color: chocolate')
+        shade_unbreak_btn = add_shadow()
+        btn_break.setGraphicsEffect(shade_unbreak_btn)
+
+        layout.addWidget(btn_left, 2, 0, alignment=QtCore.Qt.AlignRight)
+        layout.addWidget(btn_break, 2, 1, alignment=QtCore.Qt.AlignCenter)
+        layout.addWidget(btn_right, 2, 2, alignment=QtCore.Qt.AlignLeft)
+        layout.addWidget(btn_up, 1, 1, alignment=QtCore.Qt.AlignCenter)
+        layout.addWidget(btn_down, 3, 1, alignment=QtCore.Qt.AlignCenter)
+
+        self.setLayout(layout)
+
+    def arrow_left(self):
+        print('<')
+
+    def arrow_right(self):
+        print('<')
+
+    def arrow_down(self):
+        print('down')
+
+    def arrow_up(self):
+        print('^')
+
+    def next_joint(self):
+        self.joint_counter += 1
+        self.label.setText("Joint number: {}".format(self.joint_counter))
+        print('next joint: {}'.format(self.joint_counter))
+        if self.joint_counter == 6:
+            self.btn_next.setText('FINISH')
+        if self.joint_counter > 6:
+            self.joint_counter = 0
+            print(self.joint_counter)
+            self.btn_next.setText('CALIBRATE NEXT JOINT')
+            self.close()
+
+
+class Display(qtw.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Controller')
+        self.button_layout = qtw.QGridLayout()
+        self.button_layout.setColumnStretch(0, 2)
+        self.button_layout.setColumnStretch(1, 2)
+        self.calibration_gui = Calibration_view()
+
+        self.setFixedSize(width, height)
+        self.addUI()
+        self.setLayout(self.button_layout)
+
+        self.show()
+
+
+    ### GENERAL UI ADDER
+    def addUI(self):
+        label = qtw.QLabel("Status: {}".format('robot status'))
+        self.button_layout.addWidget(label, 0, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
+
+        svg_icon = add_svg('imgs/process.svg')
+        self.button_layout.addWidget(svg_icon, 0, 0, 1, 2, alignment=QtCore.Qt.AlignCenter)
+
+        btn1 = add_button('START', self.start)
+        btn2 = add_button('STOP', self.stop)
+        btn3 = add_button('UNBREAK', unbreak)
+        btn4 = add_button('CALIBRATE', self.show_calibration)
+
+        self.button_layout.addWidget(btn1, 1, 1)
+        self.button_layout.addWidget(btn2, 1, 0)
+        self.button_layout.addWidget(btn3, 2, 0)
+        self.button_layout.addWidget(btn4, 2, 1)
+
+    ### PARTICULAR WIDGET ADDERS
+    def show_calibration(self):
+        self.calibration_gui.setFixedSize(width, height)
+        self.calibration_gui.show()
+
+    def start(self):
+        print('start')
+
+    def stop(self):
+        print('stop')
+
+###COMMONS
+def add_svg(path):
+    svg_widget = QtSvg.QSvgWidget(path)
+    svg_widget.setFixedSize(100, 100)
+    return svg_widget
+
+def unbreak(self):
+    if not is_raspberry:
         print('unbreak')
+    else:
         try:
-            subprocess.run('./scripts/unbreak.bash')
+            subprocess.call('./scripts/unbreak.bash')
         except Exception as e:
             print(e)
             raise
 
-    @pyqtSlot()
-    def calibrate(self):
-        print('calibrate')
+def add_shadow():
+    shadow = qtw.QGraphicsDropShadowEffect()
+    shadow.setBlurRadius(20)
+    shadow.setColor(QtCore.Qt.lightGray)
+    return shadow
 
-    @pyqtSlot()
-    def start(self):
-        print('start')
-
-    @pyqtSlot()
-    def stop(self):
-        print('stop')
-
-class Display(qtw.QWidget):
-    def __init__(self, ):
-        super().__init__()
-        self.setWindowTitle('Controller')
-        self.button_layout = qtw.QGridLayout()
-        self.button_layout.setColumnStretch(0, 4)
-        self.button_layout.setColumnStretch(1, 4)
-
-        self.setFixedSize(WIDTH, HEIGHT)
-        self.addUI()
-        self.setLayout(self.button_layout)
-
-
-        self.showFullScreen()
-
-### GENERAL UI ADDER
-    def addUI(self):
-        self.add_button('START', 3, 1, Button_handler.start)
-        self.add_button('STOP', 4, 1, Button_handler.stop)
-        self.add_button('UNBREAK', 3, 0, Button_handler.unbreak)
-        self.add_button('CALIBRATE', 4, 0, Button_handler.calibrate)
-        self.add_svg('imgs/process.svg')
-
-    ### PARTICULAR WIDGET ADDERS
-    def add_label(self, text, column_place, row_place):
-        label = qtw.QLabel("<font color=red size=40>{}!</font>".format(text))
-
-    def add_svg(self, path):
-        svg_widget = QtSvg.QSvgWidget(path)
-        svg_widget.setFixedSize(100, 100)
-        self.button_layout.addWidget(svg_widget, 0, 0, 2, 2, alignment=QtCore.Qt.AlignCenter)
-
-    def add_button(self, name, column_place, row_place, func):
+def add_button(name, func, wid=230, hei=130):
         btn = qtw.QPushButton(name)
-        btn.setFixedSize(230, 130)
+        btn.setFixedSize(wid, hei)
         btn.clicked.connect(func)
-
-        #just a shadow design
-        shadow = qtw.QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(20)
-        shadow.setColor(QtCore.Qt.lightGray)
-
-        btn.setGraphicsEffect(shadow)
-
-        self.button_layout.addWidget(btn, column_place, row_place)
-
-### HELPERS
-    # def place_HV_widget(self, obj, placement, container = None):
-    #     if container is not None:
-    #         container.layout().addWidget(obj, placement)
-    #     else:
-    #         self.layout().addWidget(obj, placement)
-    #
-    # def place_grid_widget(self, obj, column_place, row_place, container = None):
-    #     if container is not None:
-    #         container.layout().addWidget(obj, column_place, row_place)
-    #     else:
-    #         self.layout().addWidget(obj, column_place, row_place)
+        shade = add_shadow()
+        btn.setGraphicsEffect(shade)
+        return btn
 
 def start():
-    # global client
-    # try:
-    #     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     client.connect((IP, int(PORT)))
-    # except Exception as e:
-    #     print(e)
-    subprocess.run('./scripts/start.bash')
+
+    if is_raspberry == True:
+        subprocess.run('./scripts/start.bash')
 
     app = qtw.QApplication([])
+    app.setFont(QFont('Microsoft YaHei Light', 13))
     mw = Display()
-    mw.setFixedSize(HEIGHT, WIDTH)
+    mw.setFixedSize(width, height)
+    mw.show()
 
     with open('style.qss', 'r') as f:
         _style = f.read()
