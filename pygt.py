@@ -1,12 +1,17 @@
 import PyQt5.QtWidgets as qtw
 from PyQt5 import QtSvg, QtCore
 import subprocess
-from dotenv import load_dotenv
 from PyQt5.QtGui import QFont
 import os
 
-load_dotenv()
+def set_env_var():
+    os.environ['IP'] = '10.42.0.49'
+    os.environ['PORT'] = '11311'
+    os.environ['HEIGHT'] = '480'
+    os.environ['WIDTH'] = '800'
+    os.environ['RASP'] = 'False' #changeable
 
+set_env_var()
 ip = os.getenv('IP')
 port = int(os.getenv('PORT'))
 height = int(os.getenv('HEIGHT'))
