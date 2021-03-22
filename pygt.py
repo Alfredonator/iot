@@ -5,13 +5,12 @@ from PyQt5.QtGui import QFont
 import os
 from env import set_env_var
 
-
 set_env_var()
 ip = os.getenv('IP')
 port = int(os.getenv('PORT'))
 height = int(os.getenv('HEIGHT'))
 width = int(os.getenv('WIDTH'))
-is_raspberry = os.getenv('RASP')
+is_raspberry = bool(os.getenv('RASP'))
 
 class Calibration_view(qtw.QWidget):
     def __init__(self):
@@ -84,11 +83,14 @@ class Display(qtw.QWidget):
         self.button_layout.setColumnStretch(1, 2)
         self.calibration_gui = Calibration_view()
 
-        self.setFixedSize(width, height)
         self.addUI()
         self.setLayout(self.button_layout)
 
-        self.show()
+        if is_raspberry:
+            self.showFullScreen()
+        else:
+            self.setFixedSize(width, height)
+            self.show()
 
 
     ### GENERAL UI ADDER
@@ -111,8 +113,11 @@ class Display(qtw.QWidget):
 
     ### PARTICULAR WIDGET ADDERS
     def show_calibration(self):
-        self.calibration_gui.setFixedSize(width, height)
-        self.calibration_gui.show()
+        if is_raspberry:
+            self.showFullScreen()
+        else:
+            self.calibration_gui.setFixedSize(width, height)
+            self.calibration_gui.show()
 
     def start(self):
         print('start')
@@ -152,14 +157,15 @@ def add_button(name, func, wid=230, hei=130):
 
 def start():
 
-    if is_raspberry == True:
-        subprocess.run('./scripts/start.bash')
-
     app = qtw.QApplication([])
     app.setFont(QFont('Microsoft YaHei Light', 13))
     mw = Display()
     mw.setFixedSize(width, height)
-    mw.show()
+    if is_raspberry:
+        subprocess.run('./scripts/start.bash')
+        mw.showFullScreen()
+    else:
+        mw.show()
 
     with open('style.qss', 'r') as f:
         _style = f.read()

@@ -5,4 +5,4 @@ def set_env_var():
     os.environ['PORT'] = '11311'
     os.environ['HEIGHT'] = '480'
     os.environ['WIDTH'] = '800'
-    os.environ['RASP'] = 'False' #changeable
+    os.environ['RASP'] = '' #changeable
