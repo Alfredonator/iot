@@ -115,7 +115,7 @@ class Display(qtw.QWidget):
     ### PARTICULAR WIDGET ADDERS
     def show_calibration(self):
         if is_raspberry:
-            self.showFullScreen()
+            self.calibration_gui.showFullScreen()
         else:
             self.calibration_gui.setFixedSize(width, height)
             self.calibration_gui.show()
