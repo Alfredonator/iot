@@ -48,6 +48,7 @@ class Calibration_view(qtw.QWidget):
         layout.addWidget(btn_down, 3, 1, alignment=QtCore.Qt.AlignCenter)
 
         self.setLayout(layout)
+        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
     def arrow_left(self):
         print('<')
