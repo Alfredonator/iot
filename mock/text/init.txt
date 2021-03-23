@@ -1,0 +1,22 @@
+control calibrate.launch
+... logging to /home/ros/.ros/log/fe9778e4-933d-11e9-8a76-b827eb1fb776/roslaunch-ros-desktop-2128.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+
+started roslaunch server http://ros-desktop.local:40511/
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: melodic
+ * /rosversion: 1.14.10
+
+NODES
+  /
+    calibrate (edo_control/calibrate.py)
+
+ROS_MASTER_URI=http://10.42.0.49:11311
+
+process[calibrate-1]: started with pid [2145]

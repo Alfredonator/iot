@@ -1,6 +1,11 @@
+import time
+from pynput.keyboard import Key, Controller
+
 import PyQt5.QtWidgets as qtw
 from PyQt5 import QtSvg, QtCore
 import subprocess
+import pyautogui
+from subprocess import Popen, PIPE, STDOUT
 from PyQt5.QtGui import QFont
 import os
 from env import set_env_var
@@ -12,11 +17,13 @@ height = int(os.getenv('HEIGHT'))
 width = int(os.getenv('WIDTH'))
 is_raspberry = bool(os.getenv('RASP'))
 
+
 class Calibration_view(qtw.QWidget):
     def __init__(self):
         super().__init__()
+        self.process = None
         self.joint_counter = 1
-
+        self.process = None
         layout = qtw.QGridLayout()
 
         svg_icon = add_svg('imgs/robotics.svg')
@@ -52,6 +59,9 @@ class Calibration_view(qtw.QWidget):
 
     def arrow_left(self):
         print('<')
+        self.process.stdin.write('\x1B[A')
+        self.process.stdin.flush()
+
 
     def arrow_right(self):
         print('<')
@@ -63,6 +73,12 @@ class Calibration_view(qtw.QWidget):
         print('^')
 
     def next_joint(self):
+        self.process = subprocess.Popen(["/bin/sh", '/home/patrick/PycharmProjects/iot/mock/calibrate.bash'],
+                                        stdin=subprocess.PIPE, encoding="ascii")
+        # time.sleep(3)
+        # print(p.stdout.read())
+        # self.process.stdin.write(b'\n')
+        # p.communicate(input=b'\n')
         self.joint_counter += 1
         self.label.setText("Joint number: {}".format(self.joint_counter))
         print('next joint: {}'.format(self.joint_counter))
@@ -73,6 +89,9 @@ class Calibration_view(qtw.QWidget):
             print(self.joint_counter)
             self.btn_next.setText('CALIBRATE NEXT JOINT')
             self.close()
+
+    def attach_process(self, process):
+        self.process = process
 
 
 class Display(qtw.QWidget):
@@ -92,7 +111,6 @@ class Display(qtw.QWidget):
         else:
             self.setFixedSize(width, height)
             self.show()
-
 
     ### GENERAL UI ADDER
     def addUI(self):
@@ -116,9 +134,14 @@ class Display(qtw.QWidget):
     def show_calibration(self):
         if is_raspberry:
             self.calibration_gui.showFullScreen()
+            p = subprocess.Popen(["/bin/sh", '/home/patrick/PycharmProjects/iot/scripts/calibrate.bash'])
         else:
             self.calibration_gui.setFixedSize(width, height)
             self.calibration_gui.show()
+            # p = subprocess.Popen(["/bin/sh", '/home/patrick/PycharmProjects/iot/mock/calibrate.bash'], stdin=subprocess.PIPE)
+            # subprocess.call('./mock/calibrate.bash')
+
+        # clean process from gui. Release resources
 
     def start(self):
         print('start')
@@ -126,11 +149,13 @@ class Display(qtw.QWidget):
     def stop(self):
         print('stop')
 
+
 ###COMMONS
 def add_svg(path):
     svg_widget = QtSvg.QSvgWidget(path)
     svg_widget.setFixedSize(100, 100)
     return svg_widget
+
 
 def unbreak(self):
     if not is_raspberry:
@@ -142,22 +167,24 @@ def unbreak(self):
             print(e)
             raise
 
+
 def add_shadow():
     shadow = qtw.QGraphicsDropShadowEffect()
     shadow.setBlurRadius(20)
     shadow.setColor(QtCore.Qt.lightGray)
     return shadow
 
+
 def add_button(name, func, wid=230, hei=130):
-        btn = qtw.QPushButton(name)
-        btn.setFixedSize(wid, hei)
-        btn.clicked.connect(func)
-        shade = add_shadow()
-        btn.setGraphicsEffect(shade)
-        return btn
+    btn = qtw.QPushButton(name)
+    btn.setFixedSize(wid, hei)
+    btn.clicked.connect(func)
+    shade = add_shadow()
+    btn.setGraphicsEffect(shade)
+    return btn
+
 
 def start():
-
     app = qtw.QApplication([])
     app.setFont(QFont('Microsoft YaHei Light', 13))
     mw = Display()
