@@ -1,7 +1,7 @@
 import PyQt5.QtWidgets as qtw
 from PyQt5 import QtSvg, QtCore
 import subprocess
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 import os
 from env import set_env_var
 
@@ -32,10 +32,10 @@ class Calibration_view(qtw.QWidget):
         layout.addWidget(self.label, 0, 1, 1, 2, alignment=QtCore.Qt.AlignLeft)
         layout.addWidget(self.btn_next, 0, 2, alignment=QtCore.Qt.AlignCenter)
 
-        btn_right = add_button('>', self.arrow_right, 150, 100)
-        btn_left = add_button('<', self.arrow_left, 150, 100)
-        btn_up = add_button('^', self.arrow_up, 150, 100)
-        btn_down = add_button('.', self.arrow_down, 150, 100)
+        btn_right = add_button('>', self.arrow_right, 150, 100, './imgs/arrow-right')
+        btn_left = add_button('<', self.arrow_left, 150, 100, './imgs/arrow-left')
+        btn_up = add_button('^', self.arrow_up, 150, 100, './imgs/arrow-up')
+        btn_down = add_button('.', self.arrow_down, 150, 100, './imgs/arrow-down')
         btn_break = add_button('UNBREAK', unbreak, 190, 100)
         btn_break.setStyleSheet('background-color: chocolate')
         shade_unbreak_btn = add_shadow()
@@ -63,16 +63,17 @@ class Calibration_view(qtw.QWidget):
         print('^')
 
     def next_joint(self):
+        print(self.joint_counter)
         self.joint_counter += 1
-        self.label.setText("Joint number: {}".format(self.joint_counter))
         print('next joint: {}'.format(self.joint_counter))
         if self.joint_counter == 6:
             self.btn_next.setText('FINISH')
         if self.joint_counter > 6:
-            self.joint_counter = 0
+            self.joint_counter = 1
             print(self.joint_counter)
             self.btn_next.setText('CALIBRATE NEXT JOINT')
             self.close()
+        self.label.setText("Joint number: {}".format(self.joint_counter))
 
 
 class Display(qtw.QWidget):
@@ -96,7 +97,7 @@ class Display(qtw.QWidget):
 
     ### GENERAL UI ADDER
     def addUI(self):
-        label = qtw.QLabel("Status: {}".format('robot status'))
+        label = qtw.QLabel("STATUS: {}".format('robot status'))
         self.button_layout.addWidget(label, 0, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
         svg_icon = add_svg('imgs/process.svg')
@@ -148,13 +149,17 @@ def add_shadow():
     shadow.setColor(QtCore.Qt.lightGray)
     return shadow
 
-def add_button(name, func, wid=230, hei=130):
+def add_button(name, func, wid=230, hei=130, icon_path=''):
+    if icon_path:
+        btn = qtw.QPushButton()
+        btn.setIcon(QIcon(icon_path))
+    else:
         btn = qtw.QPushButton(name)
-        btn.setFixedSize(wid, hei)
-        btn.clicked.connect(func)
-        shade = add_shadow()
-        btn.setGraphicsEffect(shade)
-        return btn
+    btn.setFixedSize(wid, hei)
+    btn.clicked.connect(func)
+    shade = add_shadow()
+    btn.setGraphicsEffect(shade)
+    return btn
 
 def start():
 
