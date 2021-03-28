@@ -4,6 +4,9 @@ import subprocess
 from PyQt5.QtGui import QFont, QIcon
 import os
 from env import set_env_var
+from handlers import Button_handler
+from pynput.keyboard import Key, Controller
+# import rospy
 
 set_env_var()
 ip = os.getenv('IP')
@@ -11,6 +14,7 @@ port = int(os.getenv('PORT'))
 height = int(os.getenv('HEIGHT'))
 width = int(os.getenv('WIDTH'))
 is_raspberry = bool(os.getenv('RASP'))
+keyboard = Controller()
 
 class Calibration_view(qtw.QWidget):
     def __init__(self):
@@ -36,6 +40,19 @@ class Calibration_view(qtw.QWidget):
         btn_left = add_button('<', self.arrow_left, 150, 100, './imgs/arrow-left')
         btn_up = add_button('^', self.arrow_up, 150, 100, './imgs/arrow-up')
         btn_down = add_button('.', self.arrow_down, 150, 100, './imgs/arrow-down')
+
+        btn_up.pressed.connect(self.up_arrow_pressed)
+        btn_up.released.connect(self.up_arrow_released)
+
+        btn_right.pressed.connect(self.right_arrow_pressed)
+        btn_right.released.connect(self.right_arrow_released)
+
+        btn_left.pressed.connect(self.left_arrow_pressed)
+        btn_left.released.connect(self.left_arrow_released)
+
+        btn_down.pressed.connect(self.down_arrow_pressed)
+        btn_down.released.connect(self.down_arrow_released)
+
         btn_break = add_button('UNBREAK', unbreak, 190, 100)
         btn_break.setStyleSheet('background-color: chocolate')
         shade_unbreak_btn = add_shadow()
@@ -48,7 +65,7 @@ class Calibration_view(qtw.QWidget):
         layout.addWidget(btn_down, 3, 1, alignment=QtCore.Qt.AlignCenter)
 
         self.setLayout(layout)
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        # subprocess.run(['powershell', '-Command', './scripts/calibration.ps1'])
 
     def arrow_left(self):
         print('<')
@@ -63,17 +80,42 @@ class Calibration_view(qtw.QWidget):
         print('^')
 
     def next_joint(self):
-        print(self.joint_counter)
+        keyboard.press(Key.enter)
+        keyboard.release(Key.enter)
+
         self.joint_counter += 1
-        print('next joint: {}'.format(self.joint_counter))
         if self.joint_counter == 6:
             self.btn_next.setText('FINISH')
         if self.joint_counter > 6:
             self.joint_counter = 1
-            print(self.joint_counter)
+            #set text to default when closing
             self.btn_next.setText('CALIBRATE NEXT JOINT')
             self.close()
         self.label.setText("Joint number: {}".format(self.joint_counter))
+
+    def up_arrow_pressed(self):
+        keyboard.press(Key.up)
+
+    def up_arrow_released(self):
+        keyboard.release(Key.up)
+
+    def down_arrow_pressed(self):
+        keyboard.press(Key.down)
+
+    def down_arrow_released(self):
+        keyboard.release(Key.down)
+
+    def right_arrow_pressed(self):
+        keyboard.press(Key.right)
+
+    def right_arrow_released(self):
+        keyboard.release(Key.right)
+
+    def left_arrow_pressed(self):
+        keyboard.press(Key.left)
+
+    def left_arrow_released(self):
+        keyboard.release(Key.left)
 
 
 class Display(qtw.QWidget):
