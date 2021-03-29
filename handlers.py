@@ -2,8 +2,6 @@ from PyQt5.QtCore import pyqtSlot
 import subprocess
 import PyQt5.QtWidgets as qtw
 
-from pygt import MainWindow
-
 class Button_handler:
 
     @pyqtSlot()
@@ -16,7 +14,7 @@ class Button_handler:
         #     raise
 
     @pyqtSlot()
-    def calibrate(self, window: MainWindow):
+    def calibrate(self):
         print('calibrate')
 
     @pyqtSlot()
@@ -26,4 +24,6 @@ class Button_handler:
     @pyqtSlot()
     def stop(self):
         print('stop')
+
+
 
